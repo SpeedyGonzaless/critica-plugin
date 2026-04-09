@@ -1,0 +1,11 @@
+{
+  "name": "critica",
+  "version": "1.0.0",
+  "description": "AI code review with specialized sub-agents for logic, security, and edge cases",
+  "author": {
+    "name": "Criteo Critica Team"
+  },
+  "repository": "https://github.com/mazurov/critica-plugin",
+  "license": "MIT",
+  "keywords": ["code-review", "security", "critica"]
+}

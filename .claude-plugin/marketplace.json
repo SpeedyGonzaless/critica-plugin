@@ -1,0 +1,27 @@
+{
+  "name": "critica",
+  "owner": {
+    "name": "Criteo Critica Team"
+  },
+  "metadata": {
+    "description": "Marketplace for the Critica AI code review plugin"
+  },
+  "plugins": [
+    {
+      "name": "critica",
+      "source": {
+        "source": "github",
+        "repo": "mazurov/critica-plugin"
+      },
+      "description": "AI code review with specialized sub-agents for logic, security, and edge cases",
+      "author": {
+        "name": "Criteo Critica Team"
+      },
+      "homepage": "https://github.com/mazurov/critica-plugin",
+      "repository": "https://github.com/mazurov/critica-plugin",
+      "license": "MIT",
+      "keywords": ["code-review", "security", "critica"],
+      "category": "code-review"
+    }
+  ]
+}
