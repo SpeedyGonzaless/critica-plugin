@@ -2,6 +2,10 @@
 
 A Claude Code plugin that runs AI-powered code reviews with specialized sub-agents for logic, security, and edge cases.
 
+## Prerequisites
+
+- [jq](https://jqlang.github.io/jq/) — used by the path-checking hook to parse JSON
+
 ## Installation
 
 From inside Claude Code:

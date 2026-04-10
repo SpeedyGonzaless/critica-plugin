@@ -35,7 +35,7 @@ Review the diff yourself as a single agent. Do NOT spawn sub-agents.
 
 Set the `subAgent` field to `"main"` for all findings.
 
-Skip to Step 4.
+Skip to Step 4 (verify), then Step 5 (summarize) and Step 6 (output).
 
 ## Step 2b: Orchestrator mode (no REVIEW.md)
 
@@ -77,23 +77,38 @@ For each finding, verify against the actual source code:
 - Verify the target line(s) contain actual code (not blank or comment-only)
 - Remove any finding that fails verification
 
-## Step 5: Output
+## Step 5: Summarize
 
-Output ONLY the final findings as a JSON array. No other text, explanation, or markdown formatting outside the JSON.
+Write two summaries:
+
+1. **`summary`** — A concise 2-3 sentence summary of what the developer changed in this diff. Focus on intent (what was done and why it might have been done), not a list of files. Write from a third-person perspective (e.g. "Refactored the auth middleware to..." not "You refactored...").
+
+2. **`findingsSummary`** — If there are findings, write 1-2 sentences highlighting the main concerns across all findings as a group. Focus on the most important themes (e.g. "The main concerns are around missing input validation and a potential race condition in the cleanup logic."). If there are no findings, omit this field or set it to null.
+
+## Step 6: Output
+
+Output ONLY a JSON object with `summary`, `findingsSummary`, and `findings` fields. No other text, explanation, or markdown formatting outside the JSON.
 
 ```json
-[
-  {
-    "filePath": "relative/path/to/file.cs",
-    "lineNumber": 42,
-    "endLineNumber": 45,
-    "severity": "error|warning|info",
-    "category": "bug|security|performance|style|maintainability",
-    "message": "Description using `inlineCode` for identifiers",
-    "suggestion": "How to fix it, using `inlineCode` for identifiers",
-    "subAgent": "name-of-the-sub-agent-that-found-this"
-  }
-]
+{
+  "summary": "2-3 sentence summary of what the developer changed",
+  "findingsSummary": "1-2 sentence aggregate summary of the main concerns across all findings",
+  "findings": [
+    {
+      "filePath": "relative/path/to/file.cs",
+      "lineNumber": 42,
+      "endLineNumber": 45,
+      "severity": "error|warning|info",
+      "category": "bug|security|performance|style|maintainability",
+      "message": "Description using `inlineCode` for identifiers",
+      "suggestion": "How to fix it, using `inlineCode` for identifiers",
+      "subAgent": "name-of-the-sub-agent-that-found-this"
+    }
+  ]
+}
 ```
 
-If no issues are found after merging and verification, output: `[]`
+If no issues are found after merging and verification, output the summary with an empty findings array:
+```json
+{"summary": "...", "findingsSummary": null, "findings": []}
+```
