@@ -41,11 +41,11 @@ Skip to Step 4 (verify), then Step 5 (summarize) and Step 6 (output).
 
 Spawn ALL of the following sub-agents in a single message (multiple Agent tool calls) so they run in parallel:
 
-- **critica-logic** — logic and correctness review
-- **critica-security** — security vulnerability review
-- **critica-edge-cases** — edge cases and error handling review
+- **critica:critica-logic** — logic and correctness review
+- **critica:critica-security** — security vulnerability review
+- **critica:critica-edge-cases** — edge cases and error handling review
 
-When spawning each agent, set the `subagent_type` to the agent name.
+When spawning each agent, set the `subagent_type` to the agent name (including the `critica:` namespace prefix).
 
 Each sub-agent prompt must include:
 
@@ -59,7 +59,7 @@ Each sub-agent prompt must include:
 
 5. The diff content.
 
-6. "Set the 'subAgent' field in each finding to your agent name (e.g., 'critica-logic')."
+6. "Set the 'subAgent' field in each finding to your short agent name without namespace (e.g., 'critica-logic')."
 
 ## Step 3: Merge findings (orchestrator mode only)
 
