@@ -9,10 +9,7 @@
   "plugins": [
     {
       "name": "critica",
-      "source": {
-        "source": "github",
-        "repo": "mazurov/critica-plugin"
-      },
+      "source": "./plugins/critica-claude",
       "description": "AI code review with specialized sub-agents for logic, security, and edge cases",
       "author": {
         "name": "Criteo Critica Team"

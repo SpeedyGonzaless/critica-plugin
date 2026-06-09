@@ -1,0 +1,21 @@
+{
+  "name": "critica",
+  "interface": {
+    "displayName": "Critica AI code review"
+  },
+  "plugins": [
+    {
+      "name": "critica",
+      "source": {
+        "source": "local",
+        "path": "./plugins/critica-codex"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "code-review",
+      "description": "AI code review skill (logic, security, edge cases) driven by `codex exec`"
+    }
+  ]
+}

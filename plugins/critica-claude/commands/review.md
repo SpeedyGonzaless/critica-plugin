@@ -49,17 +49,10 @@ When spawning each agent, set the `subagent_type` to the agent name (including t
 
 Each sub-agent prompt must include:
 
-1. "Only report issues found in the CHANGED code shown in the diff below. You have access to the full repository for context, but only flag issues in the changed lines. Use Read, Glob, and Grep to explore surrounding code for context."
+1. The JSON output format (shown below in Step 5).
+2. The diff content.
 
-2. "In 'message' and 'suggestion' fields, use `backticks` for variable names, function names, types, and short code references. Do NOT use triple backticks or multi-line code blocks inside JSON string values."
-
-3. The JSON output format (shown below in Step 5).
-
-4. "If no issues found, output an empty array: []"
-
-5. The diff content.
-
-6. "Set the 'subAgent' field in each finding to your short agent name without namespace (e.g., 'critica-logic')."
+(The scope, formatting, empty-output, and subAgent rules are part of each sub-agent's own definition — do not repeat them here.)
 
 ## Step 3: Merge findings (orchestrator mode only)
 

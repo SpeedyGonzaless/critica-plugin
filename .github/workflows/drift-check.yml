@@ -1,0 +1,9 @@
+name: drift-check
+on: [push, pull_request]
+jobs:
+  generated-in-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify generated files match content/
+        run: ./scripts/check-generated.sh
