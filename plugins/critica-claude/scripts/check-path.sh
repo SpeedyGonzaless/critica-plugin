@@ -10,8 +10,20 @@ set -euo pipefail
 set -f   # no globbing: path segments like `*` must never expand against the filesystem
 
 INPUT=$(cat)
-TOOL_NAME=$(printf '%s' "$INPUT" | jq -r '.tool_name // ""')
-CWD=$(printf '%s' "$INPUT" | jq -r '.cwd // ""')
+
+# One jq pass extracts the three fields we need (newline-separated). The path field is selected by
+# tool name: Read carries `file_path`, Glob/Grep carry `path`; any other tool yields "" (and is
+# skipped below). The trailing "." sentinel stops command substitution from trimming an empty path
+# field. Capturing via `$(...)` keeps the fail-closed contract: a jq parse error aborts under `set -e`.
+FIELDS=$(printf '%s' "$INPUT" | jq -r '
+  (.tool_name // "") as $t
+  | $t,
+    (.cwd // ""),
+    ((if $t == "Read" then .tool_input.file_path
+      elif $t == "Glob" or $t == "Grep" then .tool_input.path
+      else null end) // ""),
+    "."')
+{ IFS= read -r TOOL_NAME; IFS= read -r CWD; IFS= read -r CHECK_PATH; } <<<"$FIELDS"
 
 # Emit a "deny" decision (current PreToolUse hook schema) and stop. `jq -n --arg` encodes the
 # reason safely. Exit 0 — a deny is a policy decision, not a hook error (exit 2 is for errors).
@@ -39,12 +51,10 @@ canonicalize() {
   printf '%s' "${res:-/}"
 }
 
-# Only Read/Glob/Grep carry a filesystem path worth checking.
+# Only Read/Glob/Grep carry a filesystem path worth checking; ignore everything else.
 case "$TOOL_NAME" in
-  Read)  CHECK_PATH=$(printf '%s' "$INPUT" | jq -r '.tool_input.file_path // ""') ;;
-  Glob)  CHECK_PATH=$(printf '%s' "$INPUT" | jq -r '.tool_input.path // ""') ;;
-  Grep)  CHECK_PATH=$(printf '%s' "$INPUT" | jq -r '.tool_input.path // ""') ;;
-  *)     exit 0 ;;
+  Read|Glob|Grep) ;;
+  *) exit 0 ;;
 esac
 
 # No path given — the tool operates on cwd, which is in-bounds by definition.

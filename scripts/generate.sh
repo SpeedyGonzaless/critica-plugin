@@ -10,8 +10,20 @@ cd "$(dirname "$0")/.."
 CLAUDE_DIR="plugins/critica-claude"
 CODEX_DIR="plugins/critica-codex"
 
-gen_agent() {
-  local area="$1" name="$2" desc="$3"
+# Analysis areas — the single source of truth for what both engines generate.
+# One row per area: <content-basename>|<agent-name>|<claude-description>|<codex-focus-label>
+# To add an area: create content/<basename>.md and add one row here; both engines pick it up.
+# Keep `content/*.md` descriptions YAML-safe (no leading YAML-special chars, no ": " sequences).
+AREAS=(
+  "logic|critica-logic|Reviews code changes for logical errors and correctness bugs|logic & correctness (critica-logic)"
+  "security|critica-security|Reviews code changes for security vulnerabilities|security (critica-security)"
+  "edge-cases|critica-edge-cases|Reviews code changes for edge cases and error handling gaps|edge cases & error handling (critica-edge-cases)"
+)
+
+# Claude sub-agents — one <agent-name>.md per area, each with YAML frontmatter.
+mkdir -p "${CLAUDE_DIR}/agents"
+for row in "${AREAS[@]}"; do
+  IFS='|' read -r area name desc _focus <<<"$row"
   {
     printf -- '---\n'
     printf 'name: %s\n' "$name"
@@ -22,17 +34,9 @@ gen_agent() {
     printf '\n'
     cat "content/common.md"
   } > "${CLAUDE_DIR}/agents/${name}.md"
-}
+done
 
-mkdir -p "${CLAUDE_DIR}/agents"
-gen_agent logic      critica-logic      "Reviews code changes for logical errors and correctness bugs"
-gen_agent security   critica-security   "Reviews code changes for security vulnerabilities"
-gen_agent edge-cases critica-edge-cases "Reviews code changes for edge cases and error handling gaps"
-
-# To add a new analysis area: (1) add content/<area>.md, (2) add a gen_agent call above,
-# (3) add a matching `printf '\n## Focus: …\n\n'; cat content/<area>.md` stanza below.
-# Keep `content/*.md` descriptions YAML-safe (no leading YAML-special chars, no ": " sequences).
-# Codex skill — one SKILL.md that orchestrates three subagents from the same content.
+# Codex skill — one SKILL.md that orchestrates the same areas as subagents from the same content.
 # NOTE: keep these orchestrator steps in sync with the Claude command in
 # plugins/critica-claude/commands/review.md (same default range `HEAD`, same empty-diff output).
 mkdir -p "${CODEX_DIR}/skills/critica-review"
@@ -49,9 +53,11 @@ You are a critica code-review orchestrator. When invoked:
 3. Otherwise spawn THREE subagents in parallel — `critica-logic`, `critica-security`, `critica-edge-cases` — each with the matching focus section below, wait for all, then merge their findings.
 4. Output ONLY a JSON object: `{ "summary": "...", "findingsSummary": "... or null", "findings": [ ... ] }`. Each finding: `filePath`, `lineNumber`, `endLineNumber`, `severity` (error|warning|info), `category` (bug|security|performance|style|maintainability), `message`, `suggestion`, `subAgent`.
 HEAD
-  printf '\n## Focus: logic & correctness (critica-logic)\n\n';      cat content/logic.md
-  printf '\n## Focus: security (critica-security)\n\n';              cat content/security.md
-  printf '\n## Focus: edge cases & error handling (critica-edge-cases)\n\n'; cat content/edge-cases.md
+  for row in "${AREAS[@]}"; do
+    IFS='|' read -r area _name _desc focus <<<"$row"
+    printf '\n## Focus: %s\n\n' "$focus"
+    cat "content/${area}.md"
+  done
   printf '\n'; cat content/common.md
 } > "${CODEX_DIR}/skills/critica-review/SKILL.md"
 
