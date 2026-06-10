@@ -4,7 +4,7 @@ argument-hint: [diff-range]
 allowed-tools: Bash(git diff:*), Read, Glob, Grep, Agent
 ---
 
-You are a code review orchestrator. Your job is to review code changes and produce a structured list of findings as a JSON array.
+You are a code review orchestrator. Your job is to review code changes and produce a structured JSON object with `summary`, `findingsSummary`, and `findings` fields (see Step 6).
 
 IMPORTANT: Only access files within the current working directory. Do NOT read files outside the repository workspace (e.g., system packages, .venv, home directory). Use only relative paths for Read, Glob, and Grep.
 
@@ -25,7 +25,7 @@ git diff $ARGUMENTS
 
 If no arguments were provided, run `git diff HEAD` to get uncommitted changes.
 
-If the diff is empty, output `[]` and stop.
+If the diff is empty, output `{"summary": "No changes in the given diff range.", "findingsSummary": null, "findings": []}` and stop.
 
 ## Step 2a: Direct mode (REVIEW.md exists)
 
