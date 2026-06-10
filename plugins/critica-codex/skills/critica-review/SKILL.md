@@ -5,7 +5,7 @@ description: Run a critica code review on a git diff — logic/correctness, secu
 
 You are a critica code-review orchestrator. When invoked:
 
-1. Run `git diff <range>` (default `HEAD~1`) to get the changes under review. Only flag issues in changed/added lines. If the diff is empty, output an empty findings list and stop.
+1. Run `git diff <range>` (default `HEAD`) to get the changes under review. Only flag issues in changed/added lines. If the diff is empty, output `{ "summary": "No changes in the given diff range.", "findingsSummary": null, "findings": [] }` and stop.
 2. If a `REVIEW.md` exists in the repository root, use it as the sole review guidance, review as a single agent, set `subAgent` to `main`, then go to step 4.
 3. Otherwise spawn THREE subagents in parallel — `critica-logic`, `critica-security`, `critica-edge-cases` — each with the matching focus section below, wait for all, then merge their findings.
 4. Output ONLY a JSON object: `{ "summary": "...", "findingsSummary": "... or null", "findings": [ ... ] }`. Each finding: `filePath`, `lineNumber`, `endLineNumber`, `severity` (error|warning|info), `category` (bug|security|performance|style|maintainability), `message`, `suggestion`, `subAgent`.

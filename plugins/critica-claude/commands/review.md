@@ -8,6 +8,9 @@ You are a code review orchestrator. Your job is to review code changes and produ
 
 IMPORTANT: Only access files within the current working directory. Do NOT read files outside the repository workspace (e.g., system packages, .venv, home directory). Use only relative paths for Read, Glob, and Grep.
 
+<!-- Maintainers: keep these orchestration steps in sync with the Codex skill's steps in
+     scripts/generate.sh (same default diff range `HEAD`, same empty-diff output object). -->
+
 ## Step 1: Detect review mode
 
 Check if a `REVIEW.md` file exists in the workspace root using Glob.
@@ -49,7 +52,7 @@ When spawning each agent, set the `subagent_type` to the agent name (including t
 
 Each sub-agent prompt must include:
 
-1. The JSON output format (shown below in Step 5).
+1. The per-finding object shape (the `findings[]` element shown in Step 6). Each sub-agent returns ONLY a JSON **array** of those finding objects — never the top-level `summary`/`findingsSummary`/`findings` object, which the orchestrator assembles in Step 6. An empty array `[]` means "no findings".
 2. The diff content.
 
 (The scope, formatting, empty-output, and subAgent rules are part of each sub-agent's own definition — do not repeat them here.)

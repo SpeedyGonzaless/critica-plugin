@@ -12,7 +12,8 @@ if [ -n "$drift" ]; then
   echo "$drift" >&2
   git --no-pager diff -- $GENERATED >&2
   # `git diff` doesn't show untracked files — print new generated files in full.
-  echo "$drift" | awk '/^\?\?/{print $2}' | while read -r f; do
+  # NUL-delimited so paths with spaces/quotes are handled correctly.
+  git ls-files --others --exclude-standard -z -- $GENERATED | while IFS= read -r -d '' f; do
     echo "--- new (untracked) generated file: $f" >&2
     cat "$f" >&2
   done

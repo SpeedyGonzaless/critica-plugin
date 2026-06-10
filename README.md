@@ -138,3 +138,9 @@ git add content/ plugins/critica-claude/agents plugins/critica-codex/skills
 - the Codex `critica-review` skill (`plugins/critica-codex/skills/critica-review/SKILL.md`).
 
 CI (`drift-check`) fails if the generated files are out of sync.
+
+## Releasing
+
+The two plugins are versioned in lockstep. When cutting a release, bump `version` in **both**
+`plugins/critica-claude/.claude-plugin/plugin.json` and
+`plugins/critica-codex/.codex-plugin/plugin.json` to the same value.
